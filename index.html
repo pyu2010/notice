@@ -2,57 +2,86 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>수행평가 안내</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        /* 배경 검정, 글자 흰색 설정 */
+        /* 기본 스타일 초기화 및 배경 설정 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body { 
-            font-family: sans-serif; 
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; 
             text-align: center; 
-            padding-top: 50px; 
             background-color: #000; 
             color: #fff; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100vh; /* 화면 높이에 꽉 차게 설정 */
+            padding: 20px;
         }
-        #title { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
-        #subtitle { font-size: 24px; margin-bottom: 20px; }
-        /* 초기 d-day 색상은 흰색으로 설정 */
-        #d-day { font-size: 24px; font-weight: bold; color: #fff; }
+
+        #title { 
+            font-size: 1.5rem; /* 모바일 대응 가변 크기 */
+            font-weight: bold; 
+            margin-bottom: 8px; 
+            color: #ccc;
+        }
+
+        #subtitle { 
+            font-size: 1.2rem; 
+            margin-bottom: 40px; 
+            word-break: keep-all; /* 단어 단위 줄바꿈 */
+        }
+
+        #d-day { 
+            font-size: 3.5rem; /* 강조를 위해 크게 설정 */
+            font-weight: 900; 
+            letter-spacing: -1px;
+            transition: color 0.5s ease; /* 색상 변경 시 부드럽게 */
+        }
+
+        /* 작은 화면 기기 대응 (아이폰 SE 등) */
+        @media (max-width: 350px) {
+            #title { font-size: 1.2rem; }
+            #d-day { font-size: 2.8rem; }
+        }
     </style>
 </head>
 <body>
-    <div id="title">[ 수행평가 안내 ]</div><br><br>
+    <div id="title">수행평가 안내</div>
     <div id="subtitle">- XX 수행평가</div>
-    <div id="d-day">목표일까지 남은 시간 계산 중...</div>
+    <div id="d-day">D-Day 계산 중...</div>
 
     <script>
         $(document).ready(function() {
-            const targetDate = new Date("2026-04-14T00:00:00");		// 목표 날짜 설정
+            // 목표 날짜 설정
+            const targetDate = new Date("2026-03-16T00:00:00");
 
             function updateDisplay() {
                 const now = new Date();
-                const diff = targetDate - now; // 밀리초 단위 차이
+                const diff = targetDate - now;
 
                 if (diff <= 0) {
-                    $('#d-day').text("D-Day 목표 날짜가 지났습니다!");
-                    $('#d-day').css('color', '#ff4d4d'); // 종료 시 붉은색 유지
+                    $('#d-day').text("D-DAY 종료");
+                    $('#d-day').css('color', '#ff4d4d');
                     return;
                 }
 
                 // 남은 일수 계산
-                const dDay = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const dDay = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
-                // 텍스트 업데이트
-                $('#d-day').text(`D-Day ${dDay}`);
+                // 텍스트 업데이트 (D-Day 0은 당일을 의미)
+                $('#d-day').text(dDay === 0 ? "D-Day" : `D-${dDay}`);
 
-                // 조건부 색상 변경: 1일 이하로 남았을 때 붉은색, 그 외 흰색
+                // 1일 남았을 때(내일이 시험일 때)부터 붉은색 표시
                 if (dDay <= 1) {
-                    $('#d-day').css('color', '#ff4d4d'); // 붉은색 (가독성을 위해 살짝 밝은 레드)
+                    $('#d-day').css('color', '#ff4d4d');
                 } else {
-                    $('#d-day').css('color', '#fff');    // 흰색
+                    $('#d-day').css('color', '#fff');
                 }
             }
 
-            // 초기 실행 및 1초 주기 반복
             updateDisplay();
             setInterval(updateDisplay, 1000);
         });
