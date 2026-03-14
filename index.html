@@ -1,11 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>My First GitHub Page</title>
+    <title>실시간 시계 & D-Day</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+        #clock { font-size: 32px; font-weight: bold; color: #333; margin-bottom: 10px; }
+        #d-day { font-size: 20px; color: #e74c3c; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <h1>Hello GitHub Pages!</h1>
-    <p>첫번째 웹페이지입니다.</p>
+
+    <div id="clock">0000-00-00 00:00:00</div>
+    <div id="d-day">목표일까지 남은 시간 계산 중...</div>
+
+    <script>
+        $(document).ready(function() {
+            // 목표 날짜 설정: 2026년 7월 1일 00:00:00 (6월 31일 대신 설정)
+            const targetDate = new Date("2026-07-01T00:00:00");
+
+            function updateDisplay() {
+                const now = new Date();
+                
+                // 1. 실시간 시계 업데이트
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                
+                $('#clock').text(`${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
+
+                // 2. D-Day 계산
+                const diff = targetDate - now; // 밀리초 단위 차이
+
+                if (diff <= 0) {
+                    $('#d-day').text("D-Day 목표 날짜가 지났습니다!");
+                    return;
+                }
+
+                // 남은 일, 시, 분, 초 계산
+                const dDay = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const dHour = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const dMin = Math.floor((diff / (1000 * 60)) % 60);
+                const dSec = Math.floor((diff / 1000) % 60);
+
+                $('#d-day').text(`남은 기간: D-${dDay} ${dHour}시간 ${dMin}분 ${dSec}초`);
+            }
+
+            // 초기 실행 및 1초 주기 반복
+            updateDisplay();
+            setInterval(updateDisplay, 1000);
+        });
+    </script>
+
 </body>
 </html>
