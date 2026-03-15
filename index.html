@@ -1,111 +1,142 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>수행평가 안내</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        /* 기본 스타일 초기화 및 배경 설정 */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; 
-            background-color: #000; 
-            color: #fff; 
-            height: 100vh;
-            display: flex;
-            flex-direction: column; /* 세로 방향 레이아웃 */
-            overflow: hidden; /* 스크롤 방지 */
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta property="og:title" content="수행평가 D-day 확인">
+<meta property="og:description" content="남은 시간을 확인하세요">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pyu2010.github.io/notice/">
+<meta property="og:image" content="https://pyu2010.github.io/notice/notice_img.png">
+<title>수행평가 안내</title>
 
-        /* 상단 고정 영역 */
-        header {
-            padding: 20px;
-            text-align: center;
-        }
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        #title { 
-            font-size: 1.5rem;
-            font-weight: bold; 
-            color: #ccc;
-        }
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
 
-        /* 중앙 정렬 영역 */
-        .main-content {
-            flex: 1; /* 남은 공간을 모두 차지 */
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* 수직 중앙 정렬 */
-            align-items: center; /* 수평 중앙 정렬 */
-            text-align: center;
-            padding-bottom: 60px; /* 시각적 균형을 위해 살짝 위로 올림 */
-        }
+body{
+    font-family:'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background:#000;
+    color:#fff;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+}
 
-        #subtitle { 
-            font-size: 1.2rem; 
-            margin-bottom: 20px; 
-            word-break: keep-all;
-            color: #aaa;
-        }
+header{
+    padding:20px;
+    text-align:center;
+}
 
-        #d-day { 
-            font-size: 4rem; 
-            font-weight: 900; 
-            letter-spacing: -2px;
-            transition: color 0.5s ease;
-        }
+#title{
+    font-size:1.5rem;
+    font-weight:bold;
+    color:#ccc;
+}
 
-        /* 작은 화면 기기 대응 */
-        @media (max-width: 350px) {
-            #title { font-size: 1.2rem; }
-            #d-day { font-size: 3rem; }
-            #subtitle { font-size: 1rem; }
-        }
-    </style>
+.main-content{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.event{
+    margin:15px 0;
+    text-align:center;
+}
+
+.subtitle{
+    font-size:1.2rem;
+    color:#aaa;
+    margin-bottom:5px;
+}
+
+.d-day{
+    font-size:3rem;
+    font-weight:900;
+}
+
+</style>
 </head>
+
 <body>
-    <header>
-        <div id="title">수행평가 안내</div>
-    </header>
 
-    <div class="main-content">
-        <div id="subtitle">- 영어 수행평가</div>
-        <div id="d-day">D-Day 계산 중...</div>
-    </div>
+<header>
+<div id="title">수행평가 안내</div>
+</header>
 
-    <script>
-        $(document).ready(function() {
-            // 목표 날짜 설정
-            const targetDate = new Date("2026-03-16T00:00:00");
+<div class="main-content" id="eventList">
+</div>
 
-            function updateDisplay() {
-                const now = new Date();
-                const diff = targetDate - now;
 
-                if (diff <= 0) {
-                    $('#d-day').text("D-DAY 종료");
-                    $('#d-day').css('color', '#ff4d4d');
-                    return;
-                }
+<script>
 
-                // 남은 일수 계산
-                const dDay = Math.ceil(diff / (1000 * 60 * 60 * 24));
+$(document).ready(function(){
 
-                // 텍스트 업데이트
-                $('#d-day').text(dDay === 0 ? "D-Day" : `D-${dDay}`);
+    // ====== 여기에 수행평가 추가 ======
+    const events = [
+        { title: "영어 수행평가", date: "2026-04-16T00:00:00" },
+        { title: "수학 수행평가", date: "2026-04-20T00:00:00" },
+        { title: "과학 수행평가", date: "2026-05-02T00:00:00" }
+    ];
+    // ===============================
 
-                // 1일 남았을 때부터 붉은색 표시
-                if (dDay <= 1) {
-                    $('#d-day').css('color', 'red');
-                } else {
-                    $('#d-day').css('color', 'yellow');
-                }
+
+    // 화면 생성
+    events.forEach((event,i)=>{
+
+        $("#eventList").append(`
+            <div class="event" id="event${i}">
+                <div class="subtitle">--- ${event.title} ---</div>
+                <div class="d-day">계산중...</div>
+            </div>
+        `);
+
+    });
+
+
+    function updateDisplay(){
+
+        const now = new Date();
+
+        events.forEach((event,i)=>{
+
+            const targetDate = new Date(event.date);
+            const diff = targetDate - now;
+
+            const ddayElement = $(`#event${i} .d-day`);
+
+            if(diff <= 0){
+
+                ddayElement.text("D-DAY");
+                ddayElement.css("color","#ff4d4d");
+                return;
+
             }
 
-            updateDisplay();
-            setInterval(updateDisplay, 1000);
+            const dDay = Math.ceil(diff / (1000*60*60*24));
+
+            ddayElement.text(`D-${dDay}`);
+
+            if(dDay <= 1){
+                ddayElement.css("color","red");
+            }else{
+                ddayElement.css("color","yellow");
+            }
+
         });
-    </script>
+
+    }
+
+    updateDisplay();
+    setInterval(updateDisplay,1000);
+
+});
+
+</script>
+
 </body>
 </html>
