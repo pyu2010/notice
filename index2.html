@@ -4,26 +4,442 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>수온-시간 그래프</title>
+<title>수온-연월 그래프</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
-font-family: Arial, sans-serif;
-background-color: #f4f7fb;
-text-align: center;
-margin: 0;
-padding: 30px;
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fb;
+    text-align: center;
+    margin: 0;
+    padding: 30px;
 }
 
 .container {
-max-width: 800px;
-margin: auto;
-background-color: white;
-padding: 30px;
-border-radius: 15px;
-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-i
+input {
+    padding: 10px;
+    margin: 5px;
+    font-size: 16px;
+    width: 120px;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#dataList {
+    margin: 20px;
+}
+
+#result {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.chart-container {
+    height: 400px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>수온-연월 그래프</h1>
+
+<p>측정한 년, 월과 수온을 입력하세요.</p>
+
+<input type="number" id="yearInput" placeholder="년 (예: 2025)">
+
+<input type="number" id="monthInput" placeholder="월 (1~12)" min="1" max="12">
+
+<input type="number" id="temperatureInput" placeholder="수온(℃)" step="0.1">
+
+<br>
+
+<button onclick="addData()">데이터 추가</button>
+<button onclick="resetData()">초기화</button>
+
+
+<div id="dataList"></div>
+
+
+<div class="chart-container">
+<canvas id="temperatureChart"></canvas>
+</div>
+
+
+<div id="result"></div>
+
+
+</div>
+<script>
+
+let waterData = [];
+
+const ctx = document
+.getElementById("temperatureChart")
+.getContext("2d");
+
+
+const temperatureChart = new Chart(ctx, {
+
+type: "line",
+
+data: {
+
+labels: [],
+
+datasets: [{
+
+label: "수온 (℃)",
+
+data: [],
+
+borderColor: "blue",
+
+backgroundColor: "blue",
+
+borderWidth: 2,
+
+tension: 0,
+
+pointRadius: 5
+
+}]
+
+},
+
+options: {
+
+responsive: true,
+
+maintainAspectRatio: false,
+
+scales: {
+
+x: {
+
+title: {
+
+display: true,
+
+text: "년-월"
+
+}
+
+},
+
+y: {
+
+title: {
+
+display: true,
+
+text: "수온 (℃)"
+
+}
+
+}
+
+}
+
+}
+
+});
+
+
+
+function addData() {
+
+
+const year =
+Number(document.getElementById("yearInput").value);
+
+
+const month =
+Number(document.getElementById("monthInput").value);
+
+
+const temperature =
+Number(document.getElementById("temperatureInput").value);
+
+
+
+if(
+isNaN(year) ||
+isNaN(month) ||
+isNaN(temperature) ||
+month < 1 ||
+month > 12
+){
+
+alert("년, 월, 수온을 올바르게 입력하세요.");
+
+return;
+
+}
+
+
+
+const date =
+year + "-" + String(month).padStart(2,"0");
+
+
+
+waterData.push({
+
+date: date,
+
+temperature: temperature
+
+});
+
+
+
+waterData.sort(function(a,b){
+
+return a.date.localeCompare(b.date);
+
+});
+
+
+
+updateProgram();
+
+
+
+document.getElementById("temperatureInput").value="";
+
+}
+
+
+
+function updateProgram(){
+
+updateList();
+
+updateChart();
+
+analyzeTemperature();
+
+}
+
+
+
+function updateList(){
+
+const dataList =
+document.getElementById("dataList");
+
+
+dataList.innerHTML =
+"<h3>입력된 데이터</h3>";
+
+
+
+for(let i=0;i<waterData.length;i++){
+
+dataList.innerHTML +=
+
+waterData[i].date
++ " → "
++ waterData[i].temperature
++ "℃<br>";
+
+}
+
+}
+
+
+
+function updateChart(){
+
+
+let dates=[];
+
+let temperatures=[];
+
+
+
+for(let i=0;i<waterData.length;i++){
+
+dates.push(waterData[i].date);
+
+temperatures.push(
+waterData[i].temperature
+);
+
+}
+
+
+
+temperatureChart.data.labels =
+dates;
+
+
+temperatureChart.data.datasets[0].data =
+temperatures;
+
+
+temperatureChart.update();
+
+
+}
+
+
+
+function analyzeTemperature(){
+
+
+const result =
+document.getElementById("result");
+
+
+
+if(waterData.length < 2){
+
+result.innerHTML =
+"데이터를 2개 이상 입력하면 수온 변화를 분석합니다.";
+
+return;
+
+}
+
+
+
+let temperatures =
+waterData.map(function(data){
+
+return data.temperature;
+
+});
+
+
+
+const first =
+temperatures[0];
+
+
+const last =
+temperatures[temperatures.length-1];
+
+
+
+const change =
+last-first;
+
+
+
+const max =
+Math.max(...temperatures);
+
+
+const min =
+Math.min(...temperatures);
+
+
+
+let trend;
+
+
+
+if(change > 0){
+
+trend =
+"수온이 전체적으로 상승했습니다.";
+
+}
+
+else if(change < 0){
+
+trend =
+"수온이 전체적으로 하락했습니다.";
+
+}
+
+else{
+
+trend =
+"수온 변화가 없습니다.";
+
+}
+
+
+
+result.innerHTML =
+
+trend
+
++ "<br>수온 변화량: "
++ change.toFixed(1)
++ "℃"
+
++ "<br>최고 수온: "
++ max
++ "℃"
+
++ "<br>최저 수온: "
++ min
++ "℃";
+
+
+}
+
+
+
+function resetData(){
+
+
+waterData=[];
+
+
+temperatureChart.data.labels=[];
+
+
+temperatureChart.data.datasets[0].data=[];
+
+
+temperatureChart.update();
+
+
+
+document.getElementById("dataList").innerHTML="";
+
+
+document.getElementById("result").innerHTML="";
+
+
+document.getElementById("yearInput").value="";
+
+
+document.getElementById("monthInput").value="";
+
+
+document.getElementById("temperatureInput").value="";
+
+
+}
+
+
+</script>
+
+
+</body>
+</html>
